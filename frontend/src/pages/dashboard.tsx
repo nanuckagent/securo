@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { format } from 'date-fns'
 import { ptBR, enUS } from 'date-fns/locale'
-import { dashboard, transactions, budgets, categories as categoriesApi, accounts as accountsApi, fxRates } from '@/lib/api'
+import { dashboard, transactions, budgets, categories as categoriesApi, accounts as accountsApi } from '@/lib/api'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Button } from '@/components/ui/button'
 import { Popover, PopoverTrigger, PopoverContent } from '@/components/ui/popover'
@@ -25,7 +25,7 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from 'recharts'
-import { CheckCircle2, CalendarIcon, RefreshCw } from 'lucide-react'
+import { CheckCircle2, CalendarIcon } from 'lucide-react'
 import { PageHeader } from '@/components/page-header'
 import { CategoryIcon } from '@/components/category-icon'
 import { TransactionDrillDown, type DrillDownFilter } from '@/components/transaction-drill-down'
@@ -166,12 +166,6 @@ export default function DashboardPage() {
     },
   })
 
-  const refreshRatesMutation = useMutation({
-    mutationFn: () => fxRates.refresh(),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['dashboard'] })
-    },
-  })
 
   const cumulativeData = useMemo(() => {
     if (!balanceHistory) return []
@@ -361,16 +355,6 @@ export default function DashboardPage() {
               className="h-8 w-8 flex items-center justify-center rounded-lg border border-border bg-card text-muted-foreground hover:border-border hover:text-foreground transition-all text-base"
               onClick={() => handleMonthChange(shiftMonth(selectedMonth, 1))}
             >&#8250;</button>
-            <Button
-              variant="outline"
-              size="sm"
-              className="ml-2 h-8"
-              onClick={() => refreshRatesMutation.mutate()}
-              disabled={refreshRatesMutation.isPending}
-              title={t('dashboard.refreshRates')}
-            >
-              <RefreshCw className={`size-3.5 ${refreshRatesMutation.isPending ? 'animate-spin' : ''}`} />
-            </Button>
           </div>
         }
       />
