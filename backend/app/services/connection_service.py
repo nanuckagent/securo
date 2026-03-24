@@ -180,7 +180,19 @@ async def handle_oauth_callback(
             new_tx_ids.append(transaction.id)
             if not category_id:
                 await apply_rules_to_transaction(session, user_id, transaction)
-            await stamp_primary_amount(session, user_id, transaction)
+
+            # Prefer bank-provided conversion for international transactions
+            acct_currency = acc_data.currency or user_currency
+            if (
+                txn_data.amount_in_account_currency is not None
+                and txn_data.amount
+                and acct_currency == user_currency
+                and txn_data.currency != acct_currency
+            ):
+                transaction.amount_primary = txn_data.amount_in_account_currency
+                transaction.fx_rate_used = txn_data.amount_in_account_currency / txn_data.amount
+            else:
+                await stamp_primary_amount(session, user_id, transaction)
 
     # Detect transfer pairs among newly synced transactions
     await detect_transfer_pairs(session, user_id, candidate_ids=new_tx_ids)
@@ -348,7 +360,19 @@ async def sync_connection(
                 new_tx_ids.append(transaction.id)
                 if not category_id:
                     await apply_rules_to_transaction(session, user_id, transaction)
-                await stamp_primary_amount(session, user_id, transaction)
+
+                # Prefer bank-provided conversion for international transactions
+                acct_currency = acc_data.currency or user_currency
+                if (
+                    txn_data.amount_in_account_currency is not None
+                    and txn_data.amount
+                    and acct_currency == user_currency
+                    and txn_data.currency != acct_currency
+                ):
+                    transaction.amount_primary = txn_data.amount_in_account_currency
+                    transaction.fx_rate_used = txn_data.amount_in_account_currency / txn_data.amount
+                else:
+                    await stamp_primary_amount(session, user_id, transaction)
 
         # Detect transfer pairs among newly synced transactions
         if new_tx_ids:

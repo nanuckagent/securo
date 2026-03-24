@@ -14,6 +14,7 @@ import {
   DialogTitle,
   DialogFooter,
 } from '@/components/ui/dialog'
+import { AlertTriangle } from 'lucide-react'
 import type { Transaction, RecurringTransaction } from '@/types'
 
 export function extractApiError(error: unknown): string {
@@ -285,6 +286,12 @@ function TransactionForm({
       </div>
       {showConversion && (
         <div className="border border-border rounded-md p-3 space-y-2">
+          {transaction?.fx_fallback && (
+            <div className="flex items-start gap-2 p-2 rounded-md bg-amber-50 dark:bg-amber-950/30 text-amber-700 dark:text-amber-400">
+              <AlertTriangle size={14} className="mt-0.5 shrink-0" />
+              <span className="text-xs">{t('transactions.fxFallbackBanner')}</span>
+            </div>
+          )}
           <div>
             <span className="text-sm font-medium">{t('transactions.conversion')}</span>
             <span className="text-xs text-muted-foreground ml-2">({t('transactions.conversionHint')})</span>

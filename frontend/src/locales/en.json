@@ -132,7 +132,9 @@
     "conversionHint": "optional — leave blank for auto rate",
     "convertedAmount": "Amount in {{currency}}",
     "exchangeRate": "Exchange rate",
-    "autoCalculated": "auto"
+    "autoCalculated": "auto",
+    "fxFallbackTooltip": "Rate unavailable — using 1:1 fallback. Edit to set manually.",
+    "fxFallbackBanner": "Exchange rate unavailable — using fallback (1:1). Set the rate manually or check your FX provider settings."
   },
   "accounts": {
     "title": "Accounts",

@@ -212,6 +212,12 @@ class PluggyProvider(BankProvider):
                     # Smart payee extraction (merchant → payment data → None)
                     payee = self._extract_payee(txn, txn_type, payee_source)
 
+                    # Bank-provided conversion for international transactions
+                    amt_in_acct = txn.get("amountInAccountCurrency")
+                    amount_in_account_currency = (
+                        Decimal(str(abs(amt_in_acct))) if amt_in_acct is not None else None
+                    )
+
                     all_transactions.append(
                         TransactionData(
                             external_id=txn["id"],
@@ -220,6 +226,7 @@ class PluggyProvider(BankProvider):
                             date=txn_date,
                             type=txn_type,
                             currency=txn.get("currencyCode"),
+                            amount_in_account_currency=amount_in_account_currency,
                             pluggy_category=txn.get("category"),
                             status=status,
                             payee=payee,

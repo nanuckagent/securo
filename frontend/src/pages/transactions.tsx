@@ -14,7 +14,7 @@ import {
 } from '@/components/ui/table'
 import { Input } from '@/components/ui/input'
 import { Skeleton } from '@/components/ui/skeleton'
-import { Check, Download, Search, X } from 'lucide-react'
+import { AlertTriangle, Check, Download, Search, X } from 'lucide-react'
 import type { Transaction } from '@/types'
 import { PageHeader } from '@/components/page-header'
 import { CategoryIcon } from '@/components/category-icon'
@@ -419,9 +419,14 @@ export default function TransactionsPage() {
                       {mask(`${tx.type === 'credit' ? '+' : '−'}${formatCurrency(Math.abs(Number(tx.amount)), tx.currency, locale)}`)}
                     </span>
                     {tx.amount_primary != null && tx.currency !== userCurrency && (
-                      <span className="block text-[10px] text-muted-foreground tabular-nums">
-                        {mask(formatCurrency(Math.abs(tx.amount_primary), userCurrency, locale))}
-                      </span>
+                      <div className="flex items-center justify-end gap-1">
+                        {tx.fx_fallback && (
+                          <AlertTriangle size={11} className="text-amber-500 shrink-0" title={t('transactions.fxFallbackTooltip')} />
+                        )}
+                        <span className="text-[10px] text-muted-foreground tabular-nums">
+                          {mask(formatCurrency(Math.abs(tx.amount_primary), userCurrency, locale))}
+                        </span>
+                      </div>
                     )}
                   </TableCell>
                 </TableRow>

@@ -204,7 +204,7 @@ def parse_csv(
     desc_cols = ['description', 'descricao', 'desc', 'memo', 'historico', 'lancamento']
     amount_cols = ['amount', 'valor', 'value', 'quantia']
     currency_cols = ['currency', 'moeda', 'currency_code']
-    fx_rate_cols = ['fx_rate', 'taxa_cambio', 'exchange_rate', 'taxa']
+    fx_rate_cols = ['fx_rate', 'fx_rate_used', 'taxa_cambio', 'exchange_rate', 'taxa']
 
     def find_col(candidates):
         for c in candidates:

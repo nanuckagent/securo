@@ -20,6 +20,8 @@ CURRENCY_META = {
     "COP": {"symbol": "$", "name": "Peso Colombiano", "flag": "\U0001F1E8\U0001F1F4"},
     "PEN": {"symbol": "S/", "name": "Sol Peruano", "flag": "\U0001F1F5\U0001F1EA"},
     "UYU": {"symbol": "$U", "name": "Peso Uruguayo", "flag": "\U0001F1FA\U0001F1FE"},
+    "INR": {"symbol": "\u20B9", "name": "Indian Rupee", "flag": "\U0001F1EE\U0001F1F3"},
+    "SEK": {"symbol": "kr", "name": "Swedish Krona", "flag": "\U0001F1F8\U0001F1EA"},
 }
 
 

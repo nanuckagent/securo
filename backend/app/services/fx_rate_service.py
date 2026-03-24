@@ -23,10 +23,12 @@ async def sync_rates(
 ) -> int:
     """Fetch rates from the provider for the given date and upsert into fx_rates.
 
+    Only saves rates for currencies in `supported_currencies`.
     Idempotent — existing rates for the same date are updated.
     Returns the number of rates synced.
     """
     target = target_date or date.today()
+    supported = set(get_settings().supported_currencies.split(","))
 
     if target == date.today():
         rates = await _provider.fetch_latest()
@@ -35,6 +37,8 @@ async def sync_rates(
 
     count = 0
     for currency_code, rate in rates.items():
+        if currency_code not in supported:
+            continue
         stmt = pg_insert(FxRate).values(
             base_currency="USD",
             quote_currency=currency_code,

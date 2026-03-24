@@ -2,7 +2,7 @@ import { useEffect, useRef, useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useQuery } from '@tanstack/react-query'
 import { transactions as transactionsApi, dashboard } from '@/lib/api'
-import { X } from 'lucide-react'
+import { AlertTriangle, X } from 'lucide-react'
 import { CategoryIcon } from '@/components/category-icon'
 import { useAuth } from '@/contexts/auth-context'
 import type { Transaction } from '@/types'
@@ -242,9 +242,14 @@ export function TransactionDrillDown({
                       {formatCurrency(Math.abs(item.amount), item.currency ?? userCurrency, locale)}
                     </span>
                     {item.currency !== userCurrency && item.amountPrimary != null && (
-                      <span className="block text-[10px] text-muted-foreground tabular-nums">
-                        {formatCurrency(Math.abs(item.amountPrimary), userCurrency, locale)}
-                      </span>
+                      <div className="flex items-center justify-end gap-1">
+                        {item.transaction?.fx_fallback && (
+                          <AlertTriangle size={11} className="text-amber-500 shrink-0" title={t('transactions.fxFallbackTooltip')} />
+                        )}
+                        <span className="text-[10px] text-muted-foreground tabular-nums">
+                          {formatCurrency(Math.abs(item.amountPrimary), userCurrency, locale)}
+                        </span>
+                      </div>
                     )}
                   </div>
                 </div>

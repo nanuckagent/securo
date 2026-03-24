@@ -1283,3 +1283,128 @@ class TestManualFxOverride:
         data = resp2.json()
         # 200 * 5.0 = 1000
         assert data["amount_primary"] == 1000.0
+
+
+class TestFxFallbackFlag:
+    """Test that fx_fallback is set correctly in API responses."""
+
+    @pytest.mark.asyncio
+    async def test_foreign_currency_no_rates_returns_fx_fallback_true(
+        self,
+        client: AsyncClient,
+        auth_headers,
+        test_user: User,
+        session: AsyncSession,
+    ):
+        """Cross-currency transaction with no FX rates → fx_fallback=True."""
+        usd_account = await _make_account(session, test_user, currency="USD")
+
+        resp = await client.post(
+            "/api/transactions",
+            headers=auth_headers,
+            json={
+                "account_id": str(usd_account.id),
+                "description": "No FX rate available",
+                "amount": "50.00",
+                "date": date.today().isoformat(),
+                "type": "debit",
+                "currency": "USD",
+            },
+        )
+        assert resp.status_code == 201
+        data = resp.json()
+        # No FX rates in DB → falls back to 1:1
+        assert data["fx_rate_used"] == 1.0
+        assert data["fx_fallback"] is True
+
+    @pytest.mark.asyncio
+    async def test_foreign_currency_with_rates_returns_fx_fallback_false(
+        self,
+        client: AsyncClient,
+        auth_headers,
+        test_user: User,
+        session: AsyncSession,
+        fx_rates,
+    ):
+        """Cross-currency transaction with valid FX rates → fx_fallback=False."""
+        usd_account = await _make_account(session, test_user, currency="USD")
+
+        resp = await client.post(
+            "/api/transactions",
+            headers=auth_headers,
+            json={
+                "account_id": str(usd_account.id),
+                "description": "Has FX rate",
+                "amount": "20.00",
+                "date": date.today().isoformat(),
+                "type": "debit",
+                "currency": "USD",
+            },
+        )
+        assert resp.status_code == 201
+        data = resp.json()
+        assert data["fx_rate_used"] == 5.0
+        assert data["fx_fallback"] is False
+
+    @pytest.mark.asyncio
+    async def test_same_currency_returns_fx_fallback_false(
+        self,
+        client: AsyncClient,
+        auth_headers,
+        test_user: User,
+        session: AsyncSession,
+    ):
+        """Same-currency transaction → fx_fallback=False (not applicable)."""
+        brl_account = await _make_account(
+            session, test_user, currency="BRL", name="BRL Account",
+        )
+
+        resp = await client.post(
+            "/api/transactions",
+            headers=auth_headers,
+            json={
+                "account_id": str(brl_account.id),
+                "description": "Same currency",
+                "amount": "100.00",
+                "date": date.today().isoformat(),
+                "type": "debit",
+                "currency": "BRL",
+            },
+        )
+        assert resp.status_code == 201
+        data = resp.json()
+        assert data["fx_fallback"] is False
+
+    @pytest.mark.asyncio
+    async def test_list_endpoint_tags_fx_fallback(
+        self,
+        client: AsyncClient,
+        auth_headers,
+        test_user: User,
+        session: AsyncSession,
+    ):
+        """GET /api/transactions tags fx_fallback on listed items."""
+        usd_account = await _make_account(session, test_user, currency="USD")
+
+        # Create a transaction that will fall back to 1:1 (no rates)
+        resp = await client.post(
+            "/api/transactions",
+            headers=auth_headers,
+            json={
+                "account_id": str(usd_account.id),
+                "description": "Fallback in list",
+                "amount": "10.00",
+                "date": date.today().isoformat(),
+                "type": "debit",
+                "currency": "USD",
+            },
+        )
+        assert resp.status_code == 201
+
+        # List transactions
+        resp2 = await client.get("/api/transactions", headers=auth_headers)
+        assert resp2.status_code == 200
+        items = resp2.json()["items"]
+        fallback_items = [i for i in items if i["description"] == "Fallback in list"]
+        assert len(fallback_items) == 1
+        assert fallback_items[0]["fx_fallback"] is True
