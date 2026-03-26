@@ -102,7 +102,7 @@ export function TransactionAttachments({
       const canvas = document.createElement('canvas')
       canvas.width = viewport.width
       canvas.height = viewport.height
-      await page.render({ canvasContext: canvas.getContext('2d')!, viewport }).promise
+      await page.render({ canvas, canvasContext: canvas.getContext('2d')!, viewport }).promise
       const dataUrl = canvas.toDataURL('image/png')
       pdf.destroy()
       return dataUrl
@@ -159,7 +159,7 @@ export function TransactionAttachments({
   }, [])
 
   const uploadMutation = useMutation({
-    mutationFn: ({ file, optimisticId }: { file: File; optimisticId: string }) =>
+    mutationFn: ({ file }: { file: File; optimisticId: string }) =>
       transactionsApi.attachments.upload(transactionId, file),
     onMutate: ({ file, optimisticId }) => {
       const optimistic: OptimisticAttachment = {
@@ -358,7 +358,7 @@ export function TransactionAttachments({
         <Paperclip size={14} />
         {t('transactions.attachments')}
         {hasAttachments && (
-          <span className="text-xs text-muted-foreground font-normal">({attachments.length})</span>
+          <span className="text-xs text-muted-foreground font-normal">({attachments!.length})</span>
         )}
       </div>
 
@@ -375,7 +375,6 @@ export function TransactionAttachments({
             const isUploading = att.isUploading
             const isActive = !isUploading && activePreviewId === att.id
             const isPdf = att.content_type === 'application/pdf'
-            const isImage = isImageType(att.content_type)
             const ext = getFileExtension(att.filename).toUpperCase()
             const isConfirming = confirmDeleteId === att.id
 
