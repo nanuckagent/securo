@@ -4,3 +4,11 @@
 .playwright-mcp/
 .claude
 docs/plans/
+node_modules/
+__pycache__/
+*.log
+dist/
+.next/
+.venv/
+*.pem
+*.key
