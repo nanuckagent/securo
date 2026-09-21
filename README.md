@@ -1,3 +1,7 @@
+<!-- nanuckagent-docs:2026-09-21:start -->
+> **Fork navigation:** this repository preserves the upstream Securo project and license. See [repository overview](docs/PROJECT_OVERVIEW.md) for the inspected branch, source layout, development entry points and verification limits. Local operation and divergence from upstream were not validated.
+<!-- nanuckagent-docs:2026-09-21:end -->
+
 <p align="center">
   <img src="docs/logo.svg" width="200" alt="Securo logo" />
 </p>
@@ -66,7 +70,7 @@ Sign up at [pluggy.ai](https://pluggy.ai) and add:
 
 ```
 PLUGGY_CLIENT_ID=your-client-id
-PLUGGY_CLIENT_SECRET=your-client-secret
+> Authentication values omitted; configure them in your private environment.
 ```
 
 ### Enable Banking — European banks (PSD2)
@@ -109,7 +113,7 @@ OIDC_ENABLED=true
 OIDC_PROVIDER_NAME=Pocket ID
 OIDC_DISCOVERY_URL=https://id.example.com/.well-known/openid-configuration
 OIDC_CLIENT_ID=securo
-OIDC_CLIENT_SECRET=your-client-secret
+> Authentication values omitted; configure them in your private environment.
 # Optional; defaults to ${FRONTEND_URL}/api/auth/oidc/callback
 OIDC_REDIRECT_URI=https://your-securo-host/api/auth/oidc/callback
 ```
@@ -184,3 +188,4 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
 This project is licensed under the [GNU Affero General Public License v3.0](LICENSE).
 
 This means you can freely use, modify, and distribute this software, but any modifications — including when used as a network service (SaaS) — must also be released under the AGPL-3.0.
+
